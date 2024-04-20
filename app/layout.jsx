@@ -16,7 +16,7 @@ export default function RootLayout({ children }) {
     updateFunc.setOccupation(occupation)
     updateFunc.setBuffSkillList(
       buffSkillInfo[occupation]
-        .nameList.map((skill) => ({ ...skill, level: 1 }))
+        .nameList.map((skill) => ({ ...skill, level: 0 }))
     )
     updateFunc.setAttackSkillList(attackSkillInfo[occupation].nameList)
   }
