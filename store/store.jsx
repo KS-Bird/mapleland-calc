@@ -21,6 +21,8 @@ const useStore = create()(immer((set) => ({
   updateFunc: {
     setOccupation: (arg) => set((state) => {
       state.character.occupation = arg
+      state.selectedSkills = [{ id: 0, name: '', level: 1 }]
+      state.selectedMonsters = ['']
     }),
     setLevel: (arg) => set((state) => {
       state.character.level = arg
@@ -55,7 +57,23 @@ const useStore = create()(immer((set) => ({
     setAttackSkillList: (arg) => set((state) => {
       state.character.attackSkillList = arg
     }),
-  }
+    setSelectedSkills: (arg) => set((state) => {
+      state.selectedSkills = arg
+    }),
+    setSelectedSkill: (i, name, level) => set((state) => {
+      state.selectedSkills[i].name = name
+      state.selectedSkills[i].level = level
+    }),
+    setSelectedMonsters: (arg) => set((state) => {
+      state.selectedMonsters = arg
+    }),
+    setSelectedMonster: (i, name) => set((state) => {
+      state.selectedMonsters[i] = name
+    }),
+  },
+
+  selectedSkills: [{ id: 0, name: '', level: 1 }],
+  selectedMonsters: [''],
 })))
 
 export default useStore

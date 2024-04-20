@@ -3,7 +3,7 @@ import { useLayoutEffect } from "react"
 import { useRouter } from "next/navigation"
 import useStore from "../../store/store"
 import AttackSkillManager from "../../components/AttackSkillManager"
-import { calcStatAttack } from "../../assets/skills/skillInfo"
+import { calcStatAttack } from "../../assets/skills/commonFormulas"
 
 const gap10px = { marginRight: "10px" }
 

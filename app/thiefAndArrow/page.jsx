@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import useStore from "../../store/store"
 import AttackSkillManager from "../../components/AttackSkillManager"
-import { calcStatAttack } from "../../assets/skills/skillInfo"
+import { calcStatAttack } from "../../assets/skills/commonFormulas"
 import { useLayoutEffect } from 'react'
 
 const gap10px = { marginRight: "10px" }
@@ -19,6 +19,10 @@ export default function ThiefAndArrow() {
   }, [character.occupation, router])
 
   const [minStatAttack, maxStatAttack] = calcStatAttack(character)
+
+  const onChangeBuffSkillLevel = (i) => (e) => {
+    updateFunc.setBuffSkillLevel(i, Number(e.target.value))
+  }
 
   return (
     <div>
@@ -38,7 +42,7 @@ export default function ThiefAndArrow() {
           return (
             <div key={i}>
               <label htmlFor={krName} style={gap10px}>{krName}</label>
-              <input id={krName} type="number" onChange={(e) => updateFunc.setBuffSkillLevel(i, Number(e.target.value))} value={level} max={maxLevel} />
+              <input id={krName} type="number" onChange={onChangeBuffSkillLevel(i)} value={level} max={maxLevel} />
             </div>
           )
         })}

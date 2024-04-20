@@ -29,7 +29,7 @@ export default function RootLayout({ children }) {
     } else if (['Assassin', 'Bandit', 'Hunter', 'Crossbowman'].includes(character.occupation)) {
       router.push('/thiefAndArrow')
     }
-  }, [character.occupation, router])
+  }, [router, character.occupation])
 
   return (
     <html lang="ko">

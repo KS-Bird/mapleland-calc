@@ -1,42 +1,36 @@
 'use client'
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect, useLayoutEffect } from "react"
+import useStore from "../store/store"
 import AttackSkillTap from "./AttackSkillTap"
 import MonsterTap from "./MonsterTap"
 import KillResult from "./KillResult"
 
 export default function AttackSkillManager() {
-  const [skills, setSkills] = useState([{ id: 0, name: '', level: 1 }])
-  const setSkill = (index, name, level) => {
-    skills[index] = { ...skills[index], name, level }
-    setSkills([...skills])
-  }
+  const selectedSkills = useStore((state) => state.selectedSkills)
+  const setSelectedSkills = useStore((state) => state.updateFunc.setSelectedSkills)
+  const selectedMonsters = useStore((state) => state.selectedMonsters)
+  const setSelectedMonsters = useStore((state) => state.updateFunc.setSelectedMonsters)
 
-  const [monsters, setMonsters] = useState([''])
-  const setMonster = (index, name) => {
-    monsters[index] = name;
-    setMonsters([...monsters])
-  }
-
-  const idRef = useRef(skills[skills.length - 1]?.id + 1)
+  const idRef = useRef(selectedSkills[selectedSkills.length - 1]?.id + 1)
 
   const addTap = () => {
-    setSkills([...skills, { id: idRef.current++, name: '', level: 1 }])
-    setMonsters([...monsters, ''])
+    setSelectedSkills([...selectedSkills, { id: idRef.current++, name: '', level: 1 }])
+    setSelectedMonsters([...selectedMonsters, ''])
   }
 
   const removeTap = (index) => {
-    setSkills(skills.filter((v, i) => i != index))
-    setMonsters(monsters.filter((v, i) => i != index))
+    setSelectedSkills(selectedSkills.filter((_, i) => i != index))
+    setSelectedMonsters(selectedMonsters.filter((_, i) => i != index))
   }
 
   return (
     <>
-      {skills.map((v, i) => {
+      {selectedSkills.map((v, i) => {
         return (
           <div key={v.id}>
-            <AttackSkillTap index={i} skillName={v.name} skillLevel={v.level} setSkill={setSkill} />
-            <MonsterTap index={i} monsterName={monsters[i]} setMonster={setMonster} />
-            <KillResult skillName={v.name} skillLevel={v.level} monsterName={monsters[i]} />
+            <AttackSkillTap index={i} skillName={v.name} skillLevel={v.level} />
+            <MonsterTap index={i} monsterName={selectedMonsters[i]} />
+            <KillResult skillName={v.name} skillLevel={v.level} monsterName={selectedMonsters[i]} />
             <button onClick={() => removeTap(i)}>-</button>
           </div>
         )

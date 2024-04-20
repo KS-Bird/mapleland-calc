@@ -1,12 +1,18 @@
 'use client'
 import { monsterInfo } from "../assets/monsters/monsterInfo"
+import useStore from "../store/store"
 
-export default function MonsterTap({ index, monsterName, setMonster }) {
+export default function MonsterTap({ index, monsterName }) {
   const monster = monsterInfo.victoriaIsland[monsterName]
+  const setSelectedMonster = useStore((state) => state.updateFunc.setSelectedMonster)
+
+  const onChangeSelectedMonster = (e) => {
+    setSelectedMonster(index, e.target.value)
+  }
 
   return (
     <div>
-      <select value={monsterName || ''} onChange={(e) => setMonster(index, e.target.value)}>
+      <select value={monsterName || ''} onChange={onChangeSelectedMonster}>
         <option value='' disabled hidden >선택</option>
         {monsterInfo.victoriaIsland.nameList.map(({ name, krName }) => (<option key={name} value={name}>{krName}</option>))}
       </select>
