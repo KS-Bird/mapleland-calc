@@ -10,7 +10,7 @@ const useStore = create()(immer((set) => ({
     INT: 4,
     LUK: 4,
 
-    ATT: 0,
+    ATT: 10,
     MATT: 0,
     weaponType: null,
 

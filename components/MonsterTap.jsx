@@ -7,6 +7,7 @@ export default function MonsterTap({ index, monsterName, setMonster }) {
   return (
     <div>
       <select value={monsterName || ''} onChange={(e) => setMonster(index, e.target.value)}>
+        <option value='' disabled hidden >선택</option>
         {monsterInfo.victoriaIsland.nameList.map(({ name, krName }) => (<option key={name} value={name}>{krName}</option>))}
       </select>
       {monster &&

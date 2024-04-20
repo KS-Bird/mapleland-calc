@@ -5,13 +5,13 @@ import MonsterTap from "./MonsterTap"
 import KillResult from "./KillResult"
 
 export default function AttackSkillManager() {
-  const [skills, setSkills] = useState([{ id: 0, name: 'Avenger', level: 1 }])
+  const [skills, setSkills] = useState([{ id: 0, name: '', level: 1 }])
   const setSkill = (index, name, level) => {
     skills[index] = { ...skills[index], name, level }
     setSkills([...skills])
   }
 
-  const [monsters, setMonsters] = useState(['Slime'])
+  const [monsters, setMonsters] = useState([''])
   const setMonster = (index, name) => {
     monsters[index] = name;
     setMonsters([...monsters])
@@ -20,8 +20,8 @@ export default function AttackSkillManager() {
   const idRef = useRef(skills[skills.length - 1]?.id + 1)
 
   const addTap = () => {
-    setSkills([...skills, { id: idRef.current++, name: null, level: 1 }])
-    setMonsters([...monsters, null])
+    setSkills([...skills, { id: idRef.current++, name: '', level: 1 }])
+    setMonsters([...monsters, ''])
   }
 
   const removeTap = (index) => {
