@@ -12,15 +12,13 @@ export default function RootLayout({ children }) {
   const updateFunc = useStore((state) => state.updateFunc);
 
   const onChangeOccupation = (e) => {
-    updateFunc.setOccupation(e.target.value)
+    const occupation = e.target.value
+    updateFunc.setOccupation(occupation)
     updateFunc.setBuffSkillList(
-      buffSkillInfo[e.target.value]
-        .nameList.map(({ name, krName }) => ({ name, krName, level: 1 }))
+      buffSkillInfo[occupation]
+        .nameList.map((skill) => ({ ...skill, level: 1 }))
     )
-    updateFunc.setAttackSkillList(
-      attackSkillInfo[e.target.value]
-        .nameList.map(({ name, krName }) => ({ name, krName }))
-    )
+    updateFunc.setAttackSkillList(attackSkillInfo[occupation].nameList)
   }
 
   useLayoutEffect(() => {

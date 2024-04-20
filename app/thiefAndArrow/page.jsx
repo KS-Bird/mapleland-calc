@@ -18,11 +18,11 @@ export default function ThiefAndArrow() {
       </div>
       <br />
       <div>
-        {character.buffSkillList.map(({ krName, level }, i) => {
+        {character.buffSkillList.map(({ krName, level, maxLevel }, i) => {
           return (
             <div key={i}>
               <label htmlFor={krName} style={gap10px}>{krName}</label>
-              <input id={krName} type="number" onChange={(e) => updateFunc.setBuffSkillLevel(i, e.target.value)} value={level} />
+              <input id={krName} type="number" onChange={(e) => updateFunc.setBuffSkillLevel(i, e.target.value)} value={level} max={maxLevel} />
             </div>
           )
         })}

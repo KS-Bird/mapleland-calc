@@ -29,6 +29,7 @@ export default function AttackSkillManager() {
     setMonsters(monsters.filter((v, i) => i != index))
   }
   console.log(skills)
+  console.log(monsters)
   return (
     <>
       {skills.map((v, i) => {
