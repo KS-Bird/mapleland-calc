@@ -68,10 +68,16 @@ export const applyMonsterDefense = (characterLevel, monster, [minDamage, maxDama
   return [min, max]
 }
 
-export const calcKillProbability = ([min, max], skillPDamage, hp) => {
-  const len = Math.round(max - min) + 1
-  const range = new Array(len > 0 ? len : 0)
-    .fill(min)
+export const calcKillProbability = ([minBefore, maxBefore], skillPDamage, hp, n = 20) => {
+  console.time('t')
+  const modifier = maxBefore - minBefore > 1000 ? 0.1 : 1
+
+  minBefore *= modifier
+  maxBefore *= modifier
+  hp *= modifier
+  const len = Math.round(maxBefore - minBefore) + 1
+  const range = Array(len > 0 ? len : 0)
+    .fill(minBefore)
     .map((v, i) => {
       v += i
       v = Math.floor(v * skillPDamage)
@@ -82,34 +88,57 @@ export const calcKillProbability = ([min, max], skillPDamage, hp) => {
       }
       return v
     })
-  const probabilities = {}
-  calcPerTimes(range, probabilities, hp)
-  return probabilities
-}
+  const minAfter = range[0]
+  const maxAfter = range[range.length - 1]
+  const casesPerN = Array(n + 1).fill(0)
 
-// DP를 써보자
-const calcPerTimes = (range, probabilities, hp, val = 0, times = 1) => {
-  // 멕뎀 20번 때려도 못 잡으면 그만
-  if (range[1] * 10 < hp) {
-    return
+  const maxSum = maxAfter * n
+  const dp = Array.from({ length: n + 1 }, () => Array(maxSum + 1).fill(0))
+
+  // 멕뎀 n번으로 못잡는 경우 X
+  if (maxAfter * n < hp) {
+    return 0
   }
-  // 민뎀 20번 때려도 못 잡으면 그만
-  if (range[0] * 20 < hp) {
-    return
-  }
-  // times - 1번 때릴시 확킬이면 그만
-  if (range[0] * (times - 1) >= hp) {
-    return
-  }
-  let totalCases = 0
-  let favorableCases = 0
+
+  // 1번 때렸을때 경우의 수를 먼저 따로 계산
   range.forEach((v) => {
-    totalCases++
-    const sum = val + v
-    if (sum >= hp) {
-      favorableCases++
+    dp[1][v] = 1
+    if (v >= hp) {
+      casesPerN[1] += 1
     }
-    calcPerTimes(range, probabilities, hp, sum, times + 1)
   })
-  probabilities[times] = favorableCases / totalCases
+
+  // 2번 때렸을때부터 계산
+  // i는 횟수 k는 합 v는 더할 값
+  for (let i = 2; i <= n; i++) {
+    // 민뎀 i번으로 확킬나면 i+1부터 계산X
+    if (minAfter * (i - 1) >= hp) {
+      if (minAfter >= hp) {
+        console.log("1방에서 끝")
+      } else {
+        console.log(i - 1 + "방에서 끝")
+      }
+      break
+    }
+
+    for (let k = minAfter * i; k <= maxAfter * i; k++) {
+      range.forEach((v) => {
+        if (k - v >= 0) {
+          dp[i][k] += dp[i - 1][k - v]
+        }
+      })
+      if (k >= hp) {
+        casesPerN[i] += dp[i][k]
+      }
+    }
+  }
+
+  const probabilities = casesPerN.map((v, i) => {
+    const total = Math.pow(range.length, i)
+    const probability = Number((v / total).toFixed(3))
+    console.log(i + "번째 확률:", probability, v, total)
+    return probability
+  })
+  console.timeEnd('t')
+  return probabilities
 }
