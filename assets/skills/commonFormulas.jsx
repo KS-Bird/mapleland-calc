@@ -68,14 +68,16 @@ export const applyMonsterDefense = (characterLevel, monster, [minDamage, maxDama
   return [min, max]
 }
 
-export const calcKillProbability = ([minBefore, maxBefore], skillPDamage, hp, n = 20) => {
+export const calcKillProbability = ([minBefore, maxBefore], skillPDamage, hp, critRate = 0, critDamageRate = 0, n = 10) => {
   console.time('t')
+  const nonCritRate = 1 - critRate
   const modifier = maxBefore - minBefore > 1000 ? 0.1 : 1
 
   minBefore *= modifier
   maxBefore *= modifier
   hp *= modifier
   const len = Math.round(maxBefore - minBefore) + 1
+
   const range = Array(len > 0 ? len : 0)
     .fill(minBefore)
     .map((v, i) => {
@@ -89,22 +91,45 @@ export const calcKillProbability = ([minBefore, maxBefore], skillPDamage, hp, n 
       return v
     })
   const minAfter = range[0]
-  const maxAfter = range[range.length - 1]
+
+  const critRange = Array(len > 0 ? len : 0)
+    .fill(minBefore)
+    .map((v, i) => {
+      v += i
+      v = Math.floor(v * (skillPDamage + critDamageRate))
+      if (v < 1) {
+        v = 1
+      } else if (v > 199999) {
+        v = 199999
+      }
+      return v
+    })
+  const critMaxAfter = critRange[critRange.length - 1]
+
+  console.log(range, critRange)
+
   const casesPerN = Array(n + 1).fill(0)
 
-  const maxSum = maxAfter * n
+  const maxSum = critMaxAfter * n
   const dp = Array.from({ length: n + 1 }, () => Array(maxSum + 1).fill(0))
 
   // 멕뎀 n번으로 못잡는 경우 X
-  if (maxAfter * n < hp) {
+  if (critMaxAfter * n < hp) {
     return 0
   }
 
   // 1번 때렸을때 경우의 수를 먼저 따로 계산
   range.forEach((v) => {
-    dp[1][v] = 1
+    dp[1][v] += nonCritRate
     if (v >= hp) {
-      casesPerN[1] += 1
+      casesPerN[1] += nonCritRate
+    }
+  })
+
+  critRange.forEach((v) => {
+    dp[1][v] += critRate
+    if (v >= hp) {
+      casesPerN[1] += critRate
     }
   })
 
@@ -121,10 +146,15 @@ export const calcKillProbability = ([minBefore, maxBefore], skillPDamage, hp, n 
       break
     }
 
-    for (let k = minAfter * i; k <= maxAfter * i; k++) {
+    for (let k = minAfter * i; k <= critMaxAfter * i; k++) {
       range.forEach((v) => {
         if (k - v >= 0) {
-          dp[i][k] += dp[i - 1][k - v]
+          dp[i][k] += dp[i - 1][k - v] * nonCritRate
+        }
+      })
+      critRange.forEach((v) => {
+        if (k - v >= 0) {
+          dp[i][k] += dp[i - 1][k - v] * critRate
         }
       })
       if (k >= hp) {
@@ -135,10 +165,26 @@ export const calcKillProbability = ([minBefore, maxBefore], skillPDamage, hp, n 
 
   const probabilities = casesPerN.map((v, i) => {
     const total = Math.pow(range.length, i)
-    const probability = Number((v / total).toFixed(3))
-    console.log(i + "번째 확률:", probability, v, total)
+    const probability = v / total
+    console.log(`${i}번째 확률:${probability} = ${v}/${total}`)
     return probability
   })
   console.timeEnd('t')
-  return probabilities
+
+  const result = []
+  for (let i = 1; i < probabilities.length; i++) {
+    const v = probabilities[i]
+    if (v > 0) {
+      let percent = (v - probabilities[i - 1]) * 100
+      percent = Number(percent.toFixed(2))
+      if (percent > 0) {
+        result.push({ times: i, percent })
+      }
+      if (v >= 1) {
+        break
+      }
+    }
+  }
+
+  return result
 }

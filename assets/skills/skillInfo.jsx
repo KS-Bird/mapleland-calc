@@ -129,7 +129,8 @@ export const attackSkillInfo = {
         return v
       })
 
-      const probabilities = calcKillProbability(defenseApplied, skillPDamage, monster.hp)
+      const criticalSuccessRate = buffSkillInfo.Assassin["Critical Attack"](criticalThrowLevel).successRate
+      const probabilities = calcKillProbability(defenseApplied, skillPDamage, monster.hp, criticalSuccessRate, criticalDamageRate)
       console.log(probabilities)
 
       const result = {
